@@ -397,10 +397,13 @@ class Sistema extends Controller {
 			redirect('/sistema/login','refresh');
 		}
 
-		$arreglo = $this->Usuarios->alias_deposito($session_data['ciclo'],$session_data['alias']);
-		$row = $arreglo->row_array();
+		//$arreglo = $this->Usuarios->alias_deposito($session_data['ciclo'],$session_data['alias']);
+		//$row = $arreglo->row_array();
 
-		$datos = $this->Usuarios->datos_deposito($row['aliasdeposito'],$session_data['ciclo']);
+		//$datos = $this->Usuarios->datos_deposito($row['aliasdeposito'],$session_data['ciclo']);
+
+		$arreglo = $this->Usuarios->alias_deposito($session_data['ciclo'],$session_data['alias']);
+		$datos = $this->Usuarios->datos_deposito($arreglo,$session_data['ciclo']);
 		
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
@@ -417,7 +420,7 @@ class Sistema extends Controller {
 
 		$this->parser->parse('plantillas/index', $datos);
 				
-	}
+	}  // Revizado
 
 	// Fin Aplicacion Usuario
 

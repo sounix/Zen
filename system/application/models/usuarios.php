@@ -36,7 +36,7 @@ class Usuarios extends Model {
 		return $resultado;
 	}  // Revizado
 
-	function alias_deposito ($vciclo,$valias) {
+	function alias_deposito_old ($vciclo,$valias) {
 
 		$sql = "SELECT IF(COUNT(*) = 0,( SELECT IF(padrino = 'zen01' OR padrino = 'zen02',IF(padrino = 'zen01','zen02','zen01'),'admin') FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias' ),'admin') AS aliasdeposito FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'";
 
@@ -45,6 +45,13 @@ class Usuarios extends Model {
 		return $resultado;
 
 	}  // Revizado
+
+	function alias_deposito ($valias,$vciclo) {
+
+		$sql = "SELECT COUNT(*) AS Reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'";
+
+		return 'admin';
+	}
 
 	function datos_deposito ($valias,$vciclo) {
 
