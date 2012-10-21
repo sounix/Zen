@@ -46,11 +46,29 @@ class Usuarios extends Model {
 
 	}  // Revizado
 
-	function alias_deposito ($valias,$vciclo) {
+	function alias_deposito ($vciclo,$valias) {
 
-		$sql = "SELECT COUNT(*) AS Reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'";
+		$query = $this->db->query("SELECT COUNT(*) AS reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'");
+		$row = $query->row_array();
+		
 
-		return 'admin';
+		if ($row['reg'] == 0) {
+
+			$query2 = $this->db->query("SELECT padrino FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
+			$row2 = $query2->row_array();
+
+			if($row2['padrino'] == 'zen01' or $row2['padrino'] == 'zen02'){
+				if($row2['padrino'] == 'zen01') { $res = 'zen02'; } else { $res = 'zen01'; }
+			}
+			else {
+				$res = 'admin';
+			}
+		}
+		else {
+			$res = 'admin';
+		}
+
+		return $res;
 	}
 
 	function datos_deposito ($valias,$vciclo) {
