@@ -18,6 +18,8 @@ class DatosGenerales extends Model {
 		$sql = "INSERT INTO ciclos (id,alias,ciclo,paso,fechap0) VALUES (0,'$valias','$vciclo','0',NOW())";
 
 		$this->db->query($sql);
+
+		$this->db->query("UPDATE datosgenerales SET ciclo = '$vciclo' WHERE alias = '$valias");
 	} // Revizado	
 
 	function modificar_datos($valias,$vnombres,$vapellidos,$vmunicipio,$vestado) {

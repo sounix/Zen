@@ -9,6 +9,8 @@
 		<li><a href="<?=site_url('sistema/depositos')?>">Paso 2 - Depositos</a></li>
 		<li><a href="<?=site_url('sistema/autorizacion')?>">Paso 3 - Autorizacion</a></li>
 		<li><a href="<?=site_url('sistema/pagos')?>">Paso 4 - Pagos</a></li>
+
+		<li><a href="<?=site_url('sistema/siguientenivel')?>">Paso 5 - Pasar al siguiente Nivel</a></li>
 	</ul>
 
 	<ul>

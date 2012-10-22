@@ -21,6 +21,14 @@ INSERT INTO datosgenerales VALUES ('admin','admin@riquezaparatodos.org','Adminis
 INSERT INTO datosgenerales VALUES ('zen01','zen01@riquezaparatodos.org','Administrador','del Sistema','003','30',MD5('admin'),'0',NOW());
 INSERT INTO datosgenerales VALUES ('zen02','zen02@riquezaparatodos.org','Administrador','del Sistema','003','30',MD5('admin'),'0',NOW());
 
+INSERT INTO datosgenerales VALUES ('x01','x01@riquezaparatodos.org','X01','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x02','x02@riquezaparatodos.org','X02','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x03','x03@riquezaparatodos.org','X03','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x04','x04@riquezaparatodos.org','X04','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x05','x05@riquezaparatodos.org','X05','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x06','x06@riquezaparatodos.org','X06','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x07','x07@riquezaparatodos.org','X07','Demo','003','30',MD5('admin'),'1',NOW());
+
 
 DROP TABLE IF EXISTS agendatelefonica;
 CREATE TABLE agendatelefonica (
@@ -36,6 +44,14 @@ INSERT INTO agendatelefonica VALUES ('admin','9241095906','TELCEL','PERSONAL');
 INSERT INTO agendatelefonica VALUES ('zen01','9241095906','TELCEL','PERSONAL');
 INSERT INTO agendatelefonica VALUES ('zen02','9241095906','TELCEL','PERSONAL');
 
+INSERT INTO agendatelefonica VALUES ('x01','9241095906','TELCEL','PERSONAL');
+INSERT INTO agendatelefonica VALUES ('x02','9241095906','TELCEL','PERSONAL');
+INSERT INTO agendatelefonica VALUES ('x03','9241095906','TELCEL','PERSONAL');
+INSERT INTO agendatelefonica VALUES ('x04','9241095906','TELCEL','PERSONAL');
+INSERT INTO agendatelefonica VALUES ('x05','9241095906','TELCEL','PERSONAL');
+INSERT INTO agendatelefonica VALUES ('x06','9241095906','TELCEL','PERSONAL');
+INSERT INTO agendatelefonica VALUES ('x07','9241095906','TELCEL','PERSONAL');
+
 
 DROP TABLE IF EXISTS cuentasbancarias;
 CREATE TABLE cuentasbancarias (
@@ -50,6 +66,14 @@ CREATE TABLE cuentasbancarias (
 INSERT INTO cuentasbancarias VALUES ('admin','0123456799','BANCOMER','X99-0123456799');
 INSERT INTO cuentasbancarias VALUES ('zen01','0123456701','BANCOMER','X99-0123456701');
 INSERT INTO cuentasbancarias VALUES ('zen02','0123456702','BANCOMER','X99-0123456702');
+
+INSERT INTO cuentasbancarias VALUES ('x01','0123456702','BANCOMER','X99-0123456702');
+INSERT INTO cuentasbancarias VALUES ('x02','0123456702','BANCOMER','X99-0123456702');
+INSERT INTO cuentasbancarias VALUES ('x03','0123456702','BANCOMER','X99-0123456702');
+INSERT INTO cuentasbancarias VALUES ('x04','0123456702','BANCOMER','X99-0123456702');
+INSERT INTO cuentasbancarias VALUES ('x05','0123456702','BANCOMER','X99-0123456702');
+INSERT INTO cuentasbancarias VALUES ('x06','0123456702','BANCOMER','X99-0123456702');
+INSERT INTO cuentasbancarias VALUES ('x07','0123456702','BANCOMER','X99-0123456702');
 
 DROP TABLE IF EXISTS ciclospagos;
 CREATE TABLE ciclospagos (
@@ -100,6 +124,14 @@ INSERT INTO ciclos VALUES (0,'zen01','6','0','','','','0','0',NOW(),NOW(),NOW(),
 INSERT INTO ciclos VALUES (0,'zen02','6','0','','','','0','0',NOW(),NOW(),NOW(),NOW(),NOW());
 INSERT INTO ciclos VALUES (0,'zen01','7','0','','','','0','0',NOW(),NOW(),NOW(),NOW(),NOW());
 INSERT INTO ciclos VALUES (0,'zen02','7','0','','','','0','0',NOW(),NOW(),NOW(),NOW(),NOW());
+
+INSERT INTO ciclos VALUES (0,'x01','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
+INSERT INTO ciclos VALUES (0,'x02','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
+INSERT INTO ciclos VALUES (0,'x03','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
+INSERT INTO ciclos VALUES (0,'x04','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
+INSERT INTO ciclos VALUES (0,'x05','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
+INSERT INTO ciclos VALUES (0,'x06','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
+INSERT INTO ciclos VALUES (0,'x07','1','0',NULL,NULL,NULL,NULL,NULL,NOW(),NULL,NULL,NULL,NULL);
 
 DROP TABLE IF EXISTS municipios;
 CREATE TABLE municipios (
@@ -914,3 +946,11 @@ INSERT INTO municipios VALUES
 	('015','Tacotalpa','27','Tabasco'),
 	('016','Teapa','27','Tabasco'),
 	('017','Tenosique','27','Tabasco');
+
+CREATE VIEW candidatos AS
+SELECT
+  C.ciclo,
+  C.alias,
+  IFNULL((SELECT SUM(2) FROM ciclos WHERE padrino = C.alias AND ciclo = C.ciclo GROUP BY ciclo),0) +
+  IFNULL((SELECT SUM(3) FROM ciclos WHERE padrino IN (SELECT alias FROM ciclos WHERE padrino = C.alias AND ciclo = C.ciclo) AND ciclo = C.ciclo GROUP BY ciclo),0) AS nivel
+FROM ciclos C WHERE paso = '3';

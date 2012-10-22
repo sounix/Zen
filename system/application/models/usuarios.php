@@ -53,7 +53,7 @@ class Usuarios extends Model {
 		
 		if ($fila['val'] == '0') {
 			// pendiente por revizar
-			$query = $this->db->query("SELECT COUNT(*) AS reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'");
+			$query = $this->db->query("SELECT COUNT(*) AS reg FROM candidatos WHERE ciclo = '$vciclo' AND nivel >= '16'");
 			$row = $query->row_array();
 
 			if ($row['reg'] == 0) {
@@ -73,7 +73,20 @@ class Usuarios extends Model {
 				}
 			}
 			else {
-				$res = 'admin';
+				$query4 = $this->db->query("
+					SELECT
+					  C.alias,
+					  CAST(CC.fechap0 AS SIGNED) + CAST(CC.fechap1 AS SIGNED) + CAST(CC.fechap2 AS SIGNED) + CAST(CC.fechap3 AS SIGNED) AS fecha,
+					  IFNULL(CC.numpagos,0) AS pagos
+					FROM candidatos C
+					LEFT JOIN ciclos CC ON CC.alias = C.alias AND CC.ciclo = '1'
+					WHERE C.ciclo = '1' AND C.nivel = '16'
+					  AND IFNULL(CC.numpagos,0) < '4'
+					ORDER BY pagos
+					LIMIT 0,1
+				");
+				$row4 = $query4->row_array();
+				$res = $row4['alias'];
 			}
 
 			$this->db->query("UPDATE ciclos SET aliasdeposito = '$res' WHERE ciclo = '$vciclo' AND alias = '$valias'");
@@ -126,7 +139,6 @@ class Usuarios extends Model {
 
 		if($valias == 'zen01' or $valias == 'zen02') {
 			$sql = "SELECT id,alias AS aliasdepositario,foliodeposito,ciclo AS ciclodeposito,IF(autorizacion = '1',CONCAT('<div class=\"exito\"> Deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,'</div>'),CONCAT('<div class=\"info\"> Autorizar deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,' - <strong><a href=\"autorizar/',id,'\">CLICK</a></strong></div>')) AS msg FROM ciclos WHERE aliasdeposito = '$valias' AND NOT foliodeposito IS NULL ORDER BY ciclo,fechap2";
-			//$sql = "SELECT '23' AS id,'admin' AS aliasdepositario,'1122' AS foliodeposito,'5' AS ciclo,'error' AS msg ";
 		}
 		else {
 			$sql = "SELECT id,alias AS aliasdepositario,foliodeposito,ciclo,IF(autorizacion = '1',CONCAT('<div class=\"exito\"> Deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,'</div>'),CONCAT('<div class=\"info\"> Autorizar deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,' - <strong><a href=\"autorizar/',id,'\">CLICK</a></strong></div>')) AS msg FROM ciclos WHERE aliasdeposito = '$valias' AND ciclo = '$vciclo' AND NOT foliodeposito IS NULL ORDER BY fechap2 ASC";
@@ -171,7 +183,7 @@ class Usuarios extends Model {
 		$query2 = $this->db->query("SELECT ciclo,aliasdeposito FROM ciclos WHERE id = '$vid'");
 		$row2 = $query2->row_array();
 
-		$sql = "UPDATE ciclos SET numpagos = numpagos + 1 WHERE ciclo = '". $row2['ciclo'] . "' AND alias = '". $row2['aliasdeposito'] . "'";
+		$sql = "UPDATE ciclos SET numpagos = IFNULL(numpagos,0) + 1 WHERE ciclo = '". $row2['ciclo'] . "' AND alias = '". $row2['aliasdeposito'] . "'";
 
 		$this->db->query($sql);			
 

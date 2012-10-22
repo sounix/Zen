@@ -503,6 +503,20 @@ class Sistema extends Controller {
 
 	}   // Revizado
 
+	function siguientenivel() {
+
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		$this->DatosGenerales->insertar_ciclo($session_data['alias'],$session_data['ciclo'] + 1);
+		$this->session->unset_userdata('session_array');
+
+		redirect('/sistema/login','refresh');
+
+	}   // Revizado
+
 	// Fin Aplicacion Usuario
 
 }
