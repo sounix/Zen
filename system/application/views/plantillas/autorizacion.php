@@ -7,8 +7,6 @@
 			<!--<span class="otro"><time datetime="{tiempo}">Hoy es {tiempohumano}</time>-->
 		</div>
 
-		<div class="mensajes"> 
-			<div class="info"> Usted se encuentra en el Ciclo {ciclo}</div>
-		</div>
+		<div class="mensajes"> {msg} </div>
 
 	</div>

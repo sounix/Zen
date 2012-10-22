@@ -6,6 +6,8 @@
 			<!--<span class="otro"><time datetime="{tiempo}">Hoy es {tiempohumano}</time>-->
 		</div>
 
+		<div class="mensajes"> {msg} </div>
+
 		<div id="formulario_cambiarpatrocinador">
 			<form id="formcambiarpatrocinador" class="jqtransform zenform" name="jqtransform" action="<?=site_url('sistema/cambiarpatrocinador')?>" method="post">
 			

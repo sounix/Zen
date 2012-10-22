@@ -8,10 +8,10 @@
 		</div>
 {vdatos}
 		<div id="formulario_registro">
-			<form id="formregistro" class="jqtransform zenform" name="jqtransform" action="" method="post">
+			<form id="formregistro" class="jqtransform zenform" name="jqtransform" action="<?=site_url('sistema/foliodeposito')?>" method="post">
 
 				<div class="rowElem">
-					<label for="alias">Alias:</label><input type="text" disabled value="{valias}" name="alias">	
+					<label for="aliasdeposito">Alias:</label><input type="text" disabled value="{valias}" name="aliasdeposito">	
 				</div>
 				<div class="rowElem">
 					<label for="email">Email:</label><input type="text" disabled value="{vemail}" name="email">	
@@ -44,7 +44,7 @@
 			<br><br>
 
 				<div class="rowElem">
-					<label for="folio">Folio de Deposito:</label><input type="text" value="" name="folio" placeholder="Ingresa folio">	
+					<label for="folio">Folio de Deposito:</label>{folio}
 				</div>
 				<br>
 				<div class="rowElem"><label for=""></label><input type="submit" value=" Enviar " /></div>

@@ -52,12 +52,12 @@ class Usuarios extends Model {
 		$fila = $tabla->row_array();
 		
 		if ($fila['val'] == '0') {
-
+			// pendiente por revizar
 			$query = $this->db->query("SELECT COUNT(*) AS reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'");
 			$row = $query->row_array();
 
 			if ($row['reg'] == 0) {
-
+				
 				$query2 = $this->db->query("SELECT padrino FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
 				$row2 = $query2->row_array();
 
@@ -65,7 +65,11 @@ class Usuarios extends Model {
 					if($row2['padrino'] == 'zen01') { $res = 'zen02'; } else { $res = 'zen01'; }
 				}
 				else {
-					$res = 'admin';
+
+					$query3 = $this->db->query("SELECT Padrino, SUM(PL) AS PL, SUM(PR) AS PR FROM ( SELECT 'Padrino' AS Padrino, COUNT(*) AS PL, 0 AS PR FROM ciclos WHERE aliasdeposito = 'zen01' AND autorizacion IS NULL UNION ALL SELECT 'Padrino' AS Padrino, 0 AS PL, COUNT(*) AS PR FROM ciclos WHERE aliasdeposito = 'zen02' AND autorizacion IS NULL ) AS A GROUP BY Padrino");
+					$row3 = $query3->row_array();
+
+					if($row3['PL'] <= $row3['PR']) { $res = 'zen01'; } else { $res = 'zen02'; }
 				}
 			}
 			else {
@@ -78,6 +82,7 @@ class Usuarios extends Model {
 		else {
 
 			$res = $fila['val'];
+
 		}
 		
 		return $res;
@@ -92,6 +97,46 @@ class Usuarios extends Model {
 		return $resultado;
 
 	}  // Revizado
+
+	function mostrar_foliodeposito ($valias,$vciclo) {
+		$query2 = $this->db->query("SELECT IFNULL(foliodeposito,'0') AS folio FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
+		$row2 = $query2->row_array();
+
+		if($row2['folio'] == '0') { 
+			$res = '<input type="text" value="" name="folio" placeholder="Ingresa folio">'; 
+		} 
+		else { 
+			$res = '<input type="text" disabled value="'. $row2['folio'] .'" name="folio" placeholder="Ingresa folio">	'; 
+		}
+
+		return $res;
+	}  // Revizado
+
+	function msg_autorizacion ($valias,$vciclo) {
+		$query2 = $this->db->query("SELECT CASE WHEN paso >= '2' THEN IF(autorizacion IS NULL,CONCAT('<div class=\"alerta\">Su deposito con Folio ',foliodeposito,' para Alias <strong>', aliasdeposito ,'</strong> aun no esta Confirmado</div>'),CONCAT('<div class=\"info\">Su deposito con Folio ', foliodeposito ,' para Alias <strong>', aliasdeposito ,'</strong> ya fue Confirmado</div>')) ELSE '' END AS msg FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
+		$row2 = $query2->row_array();
+
+		$res = $row2['msg']; 
+		
+		return $res;
+
+	}  // Revizado
+
+	function lista_autorizaciones ($valias,$vciclo) {
+
+		if($valias == 'zen01' or $valias == 'zen02') {
+			$sql = "SELECT id,alias AS aliasdepositario,foliodeposito,ciclo AS ciclodeposito,IF(autorizacion = '1',CONCAT('<div class=\"exito\"> Deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,'</div>'),CONCAT('<div class=\"info\"> Autorizar deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,' - <strong><a href=\"autorizar/',id,'\">CLICK</a></strong></div>')) AS msg FROM ciclos WHERE aliasdeposito = '$valias' AND NOT foliodeposito IS NULL ORDER BY ciclo,fechap2";
+			//$sql = "SELECT '23' AS id,'admin' AS aliasdepositario,'1122' AS foliodeposito,'5' AS ciclo,'error' AS msg ";
+		}
+		else {
+			$sql = "SELECT id,alias AS aliasdepositario,foliodeposito,ciclo,IF(autorizacion = '1',CONCAT('<div class=\"exito\"> Deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,'</div>'),CONCAT('<div class=\"info\"> Autorizar deposito de alias: <strong>',alias,'</strong> con folio: ',foliodeposito,' del ciclo: ',ciclo,' - <strong><a href=\"autorizar/',id,'\">CLICK</a></strong></div>')) AS msg FROM ciclos WHERE aliasdeposito = '$valias' AND ciclo = '$vciclo' AND NOT foliodeposito IS NULL ORDER BY fechap2 ASC";
+		}
+
+		$resultado = $this->db->query($sql);
+
+		return $resultado;
+
+	}
 
 	function lista_datos(){
 
@@ -109,4 +154,26 @@ class Usuarios extends Model {
 		$this->db->query($sql);	
 	}  // Revizado
 
+	function modificar_foliodeposito($valias,$vciclo,$vfolio) {
+		
+		$sql = "UPDATE ciclos SET foliodeposito = '$vfolio', fechap2 = NOW(), paso = '2' WHERE alias = '$valias' AND ciclo = '$vciclo'";
+
+		$this->db->query($sql);	
+
+	}  // Revizado
+
+	function autorizar_foliodeposito($vid) {
+
+		$sql = "UPDATE ciclos SET paso = '3', autorizacion = '1', fechap3 = NOW() WHERE id = '$vid'";
+
+		$this->db->query($sql);	
+
+		$query2 = $this->db->query("SELECT ciclo,aliasdeposito FROM ciclos WHERE id = '$vid'");
+		$row2 = $query2->row_array();
+
+		$sql = "UPDATE ciclos SET numpagos = numpagos + 1 WHERE ciclo = '". $row2['ciclo'] . "' AND alias = '". $row2['aliasdeposito'] . "'";
+
+		$this->db->query($sql);			
+
+	}
 }

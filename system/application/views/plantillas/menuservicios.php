@@ -7,7 +7,7 @@
 	<ul>
 		<li><a href="<?=site_url('sistema/patrocinador')?>">Paso 1 - Padrino</a></li>
 		<li><a href="<?=site_url('sistema/depositos')?>">Paso 2 - Depositos</a></li>
-		<li><a href="<?=site_url('sistema/autorizaciones')?>">Paso 3 - Autorizacion</a></li>
+		<li><a href="<?=site_url('sistema/autorizacion')?>">Paso 3 - Autorizacion</a></li>
 		<li><a href="<?=site_url('sistema/pagos')?>">Paso 4 - Pagos</a></li>
 	</ul>
 

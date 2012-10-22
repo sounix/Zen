@@ -315,10 +315,12 @@ class Sistema extends Controller {
 		if($session_data['patrocinador'] == 'admin' ) { 
 			//$patrocinador = ''; 
 			$patrocinador = '<input type="text" value="" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
+			$msg = '<div class="alerta"> Debera resgistrar un Padrino </div>';
 		} 
 		else { 
 			//$patrocinador = $session_data['patrocinador'];
 			$patrocinador = '<input type="text" disabled value="' . $session_data['patrocinador'] . '" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
+			$msg = '<div class="exito"> Padrino registrado con exito </div>';
 		}
 
 		$datos = array(
@@ -330,6 +332,7 @@ class Sistema extends Controller {
 			'tiempohumano' => date('d \d\e F \d\e Y'),
  			'tiempo' => date('Y-m-d'),
 			'patrocinador' => $patrocinador,
+			'msg' => $msg,
 			'ciclo' => $session_data['ciclo']
 		);
 
@@ -397,10 +400,7 @@ class Sistema extends Controller {
 			redirect('/sistema/login','refresh');
 		}
 
-		//$arreglo = $this->Usuarios->alias_deposito($session_data['ciclo'],$session_data['alias']);
-		//$row = $arreglo->row_array();
-
-		//$datos = $this->Usuarios->datos_deposito($row['aliasdeposito'],$session_data['ciclo']);
+		$folio = $this->Usuarios->mostrar_foliodeposito($session_data['alias'],$session_data['ciclo']);		
 
 		$arreglo = $this->Usuarios->alias_deposito($session_data['ciclo'],$session_data['alias']);
 		$datos = $this->Usuarios->datos_deposito($arreglo,$session_data['ciclo']);
@@ -414,6 +414,7 @@ class Sistema extends Controller {
 			'ciclo' => $session_data['ciclo'],
 			'tiempohumano' => date('d \d\e F \d\e Y'),
  			'tiempo' => date('Y-m-d'),
+ 			'folio' => $folio,
 
  			'vdatos' => $datos->result_array()
 		);
@@ -421,6 +422,86 @@ class Sistema extends Controller {
 		$this->parser->parse('plantillas/index', $datos);
 				
 	}  // Revizado
+
+	function foliodeposito () {
+
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		$this->Usuarios->modificar_foliodeposito($session_data['alias'],$session_data['ciclo'],$this->input->post('folio'));
+
+		redirect('/sistema/depositos','refresh');
+
+	}   // Revizado
+
+	function autorizacion() {
+		$temp = array();
+
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		$msg = $this->Usuarios->msg_autorizacion($session_data['alias'],$session_data['ciclo']);	
+		
+		$datos = array(
+			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
+			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/autorizacion', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'nombrecompleto' => $session_data['nombrecompleto'],
+			'alias' => $session_data['alias'],
+			'ciclo' => $session_data['ciclo'],
+			'msg' => $msg,
+			
+			'tiempohumano' => date('d \d\e F \d\e Y'),
+ 			'tiempo' => date('Y-m-d')
+		);
+
+		$this->parser->parse('plantillas/index', $datos);
+				
+	}   // Revizado
+
+	function pagos() {
+		$temp = array();
+
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		$lista_autorizaciones = $this->Usuarios->lista_autorizaciones($session_data['alias'],$session_data['ciclo']);	
+		
+		$datos = array(
+			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
+			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/pagos', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'nombrecompleto' => $session_data['nombrecompleto'],
+			'alias' => $session_data['alias'],
+			'ciclo' => $session_data['ciclo'],
+			'lista_autorizaciones' => $lista_autorizaciones->result_array(),
+			
+			'tiempohumano' => date('d \d\e F \d\e Y'),
+ 			'tiempo' => date('Y-m-d')
+		);
+
+		$this->parser->parse('plantillas/index', $datos);
+				
+	}   // Revizado
+
+	function autorizar ($vid) {
+
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		$this->Usuarios->autorizar_foliodeposito($vid);
+
+		redirect('/sistema/pagos','refresh');
+
+	}   // Revizado
 
 	// Fin Aplicacion Usuario
 
