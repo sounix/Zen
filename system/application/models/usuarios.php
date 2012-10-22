@@ -48,26 +48,38 @@ class Usuarios extends Model {
 
 	function alias_deposito ($vciclo,$valias) {
 
-		$query = $this->db->query("SELECT COUNT(*) AS reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'");
-		$row = $query->row_array();
+		$tabla = $this->db->query("SELECT IFNULL(aliasdeposito,'0') AS val FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
+		$fila = $tabla->row_array();
 		
+		if ($fila['val'] == '0') {
 
-		if ($row['reg'] == 0) {
+			$query = $this->db->query("SELECT COUNT(*) AS reg FROM ciclos WHERE ciclo = '$vciclo' AND paso = '3'");
+			$row = $query->row_array();
 
-			$query2 = $this->db->query("SELECT padrino FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
-			$row2 = $query2->row_array();
+			if ($row['reg'] == 0) {
 
-			if($row2['padrino'] == 'zen01' or $row2['padrino'] == 'zen02'){
-				if($row2['padrino'] == 'zen01') { $res = 'zen02'; } else { $res = 'zen01'; }
+				$query2 = $this->db->query("SELECT padrino FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
+				$row2 = $query2->row_array();
+
+				if($row2['padrino'] == 'zen01' or $row2['padrino'] == 'zen02'){
+					if($row2['padrino'] == 'zen01') { $res = 'zen02'; } else { $res = 'zen01'; }
+				}
+				else {
+					$res = 'admin';
+				}
 			}
 			else {
 				$res = 'admin';
 			}
+
+			$this->db->query("UPDATE ciclos SET aliasdeposito = '$res' WHERE ciclo = '$vciclo' AND alias = '$valias'");
+
 		}
 		else {
-			$res = 'admin';
-		}
 
+			$res = $fila['val'];
+		}
+		
 		return $res;
 	}
 
