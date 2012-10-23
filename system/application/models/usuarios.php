@@ -48,45 +48,38 @@ class Usuarios extends Model {
 
 	function alias_deposito ($vciclo,$valias) {
 
-		$tabla = $this->db->query("SELECT IFNULL(aliasdeposito,'0') AS val FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
+		$tabla = $this->db->query("
+			SELECT 
+				IFNULL(aliasdeposito,'0') AS val 
+			FROM ciclos 
+			WHERE ciclo = '$vciclo' AND alias = '$valias'
+		");
 		$fila = $tabla->row_array();
 		
 		if ($fila['val'] == '0') {
-			// pendiente por revizar
-			$query = $this->db->query("SELECT COUNT(*) AS reg FROM candidatos WHERE ciclo = '$vciclo' AND nivel >= '16'");
-			$row = $query->row_array();
-
-			if ($row['reg'] == 0) {
 				
-				$query2 = $this->db->query("SELECT padrino FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
-				$row2 = $query2->row_array();
+			$query2 = $this->db->query("
+				SELECT 
+					padrino 
+				FROM ciclos 
+				WHERE ciclo = '$vciclo' AND alias = '$valias'
+			");
+			$row2 = $query2->row_array();
 
-				if($row2['padrino'] == 'zen01' or $row2['padrino'] == 'zen02'){
-					if($row2['padrino'] == 'zen01') { $res = 'zen02'; } else { $res = 'zen01'; }
-				}
-				else {
-
-					$query3 = $this->db->query("SELECT Padrino, SUM(PL) AS PL, SUM(PR) AS PR FROM ( SELECT 'Padrino' AS Padrino, COUNT(*) AS PL, 0 AS PR FROM ciclos WHERE aliasdeposito = 'zen01' AND autorizacion IS NULL UNION ALL SELECT 'Padrino' AS Padrino, 0 AS PL, COUNT(*) AS PR FROM ciclos WHERE aliasdeposito = 'zen02' AND autorizacion IS NULL ) AS A GROUP BY Padrino");
-					$row3 = $query3->row_array();
-
-					if($row3['PL'] <= $row3['PR']) { $res = 'zen01'; } else { $res = 'zen02'; }
-				}
+			if($row2['padrino'] == 'zen01' or $row2['padrino'] == 'zen02'){
+				if($row2['padrino'] == 'zen01') { $res = 'zen02'; } else { $res = 'zen01'; }
 			}
 			else {
-				$query4 = $this->db->query("
-					SELECT
-					  C.alias,
-					  CAST(CC.fechap0 AS SIGNED) + CAST(CC.fechap1 AS SIGNED) + CAST(CC.fechap2 AS SIGNED) + CAST(CC.fechap3 AS SIGNED) AS fecha,
-					  IFNULL(CC.numpagos,0) AS pagos
-					FROM candidatos C
-					LEFT JOIN ciclos CC ON CC.alias = C.alias AND CC.ciclo = '1'
-					WHERE C.ciclo = '1' AND C.nivel = '16'
-					  AND IFNULL(CC.numpagos,0) < '4'
-					ORDER BY pagos
-					LIMIT 0,1
+
+				$query3 = $this->db->query("
+					SELECT 
+						padrino 
+					FROM ciclos 
+					WHERE ciclo = '$vciclo' AND alias = '" . $row2['padrino'] ."'
 				");
-				$row4 = $query4->row_array();
-				$res = $row4['alias'];
+				$row3 = $query3->row_array();
+
+				$res = $row3['padrino']; 
 			}
 
 			$this->db->query("UPDATE ciclos SET aliasdeposito = '$res' WHERE ciclo = '$vciclo' AND alias = '$valias'");
@@ -124,6 +117,19 @@ class Usuarios extends Model {
 
 		return $res;
 	}  // Revizado
+
+	function msg_foliodeposito ($valias,$vciclo) {
+		$query2 = $this->db->query("
+			SELECT
+  				IF(foliodeposito IS NULL,CONCAT('<div class=\"info\"> Registre el folio de la ficha de deposito para Alias <strong>', aliasdeposito ,'</strong></div>'),CONCAT('<div class=\"exito\">Su deposito con Folio ', foliodeposito ,' para Alias <strong>', aliasdeposito ,'</strong> ya fue Registrado</div>')) AS msg
+			FROM ciclos
+			WHERE ciclo = '$vciclo' AND alias = '$valias'");
+		$row2 = $query2->row_array();
+
+		$res = $row2['msg']; 
+		
+		return $res;
+	}
 
 	function msg_autorizacion ($valias,$vciclo) {
 		$query2 = $this->db->query("SELECT CASE WHEN paso >= '2' THEN IF(autorizacion IS NULL,CONCAT('<div class=\"alerta\">Su deposito con Folio ',foliodeposito,' para Alias <strong>', aliasdeposito ,'</strong> aun no esta Confirmado</div>'),CONCAT('<div class=\"info\">Su deposito con Folio ', foliodeposito ,' para Alias <strong>', aliasdeposito ,'</strong> ya fue Confirmado</div>')) ELSE '' END AS msg FROM ciclos WHERE ciclo = '$vciclo' AND alias = '$valias'");
@@ -165,6 +171,40 @@ class Usuarios extends Model {
 
 		$this->db->query($sql);	
 	}  // Revizado
+
+	function verificar_patrocinador ($vpatrocinador,$vciclo) {
+
+		$query_existe = $this->db->query("
+			SELECT
+			  COUNT(*) AS reg
+			FROM ciclos
+			WHERE alias = '$vpatrocinador' AND ciclo = '$vciclo'
+		");
+		$row_existe = $query_existe->row_array();
+
+		if($row_existe['reg'] == 0) {
+			$resultado = '91';
+		}
+		else {
+			if($vpatrocinador == 'zen01' or $vpatrocinador == 'zen02') {
+				$resultado = '0';
+			}
+			else {
+				$query_paso = $this->db->query("
+					SELECT
+					  COUNT(*) AS reg
+					FROM ciclos
+					WHERE alias = '$vpatrocinador' AND ciclo = '$vciclo' AND paso = '3'
+				");
+				$row_paso = $query_paso->row_array();
+
+				if($row_paso['reg'] == 0) { $resultado = '92'; } else { $resultado = '0'; }
+			}
+		}
+
+		return $resultado;
+
+	}
 
 	function modificar_foliodeposito($valias,$vciclo,$vfolio) {
 		

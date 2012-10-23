@@ -21,13 +21,13 @@ INSERT INTO datosgenerales VALUES ('admin','admin@riquezaparatodos.org','Adminis
 INSERT INTO datosgenerales VALUES ('zen01','zen01@riquezaparatodos.org','Administrador','del Sistema','003','30',MD5('admin'),'0',NOW());
 INSERT INTO datosgenerales VALUES ('zen02','zen02@riquezaparatodos.org','Administrador','del Sistema','003','30',MD5('admin'),'0',NOW());
 
-INSERT INTO datosgenerales VALUES ('x01','x01@riquezaparatodos.org','X01','Demo','003','30',MD5('admin'),'1',NOW());
-INSERT INTO datosgenerales VALUES ('x02','x02@riquezaparatodos.org','X02','Demo','003','30',MD5('admin'),'1',NOW());
-INSERT INTO datosgenerales VALUES ('x03','x03@riquezaparatodos.org','X03','Demo','003','30',MD5('admin'),'1',NOW());
-INSERT INTO datosgenerales VALUES ('x04','x04@riquezaparatodos.org','X04','Demo','003','30',MD5('admin'),'1',NOW());
-INSERT INTO datosgenerales VALUES ('x05','x05@riquezaparatodos.org','X05','Demo','003','30',MD5('admin'),'1',NOW());
-INSERT INTO datosgenerales VALUES ('x06','x06@riquezaparatodos.org','X06','Demo','003','30',MD5('admin'),'1',NOW());
-INSERT INTO datosgenerales VALUES ('x07','x07@riquezaparatodos.org','X07','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x01','x01@rq.org','X01','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x02','x02@rq.org','X02','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x03','x03@rq.org','X03','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x04','x04@rq.org','X04','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x05','x05@rq.org','X05','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x06','x06@rq.org','X06','Demo','003','30',MD5('admin'),'1',NOW());
+INSERT INTO datosgenerales VALUES ('x07','x07@rq.org','X07','Demo','003','30',MD5('admin'),'1',NOW());
 
 
 DROP TABLE IF EXISTS agendatelefonica;
@@ -84,11 +84,11 @@ CREATE TABLE ciclospagos (
 
 INSERT INTO ciclospagos VALUES ('1',100.00);
 INSERT INTO ciclospagos VALUES ('2',200.00);
-INSERT INTO ciclospagos VALUES ('3',400.00);
-INSERT INTO ciclospagos VALUES ('4',800.00);
-INSERT INTO ciclospagos VALUES ('5',1600.00);
-INSERT INTO ciclospagos VALUES ('6',3200.00);
-INSERT INTO ciclospagos VALUES ('7',6400.00);
+INSERT INTO ciclospagos VALUES ('3',500.00);
+INSERT INTO ciclospagos VALUES ('4',1000.00);
+INSERT INTO ciclospagos VALUES ('5',2000.00);
+INSERT INTO ciclospagos VALUES ('6',5000.00);
+INSERT INTO ciclospagos VALUES ('7',10000.00);
 
 DROP TABLE IF EXISTS ciclos;
 CREATE TABLE ciclos (
@@ -946,11 +946,3 @@ INSERT INTO municipios VALUES
 	('015','Tacotalpa','27','Tabasco'),
 	('016','Teapa','27','Tabasco'),
 	('017','Tenosique','27','Tabasco');
-
-CREATE VIEW candidatos AS
-SELECT
-  C.ciclo,
-  C.alias,
-  IFNULL((SELECT SUM(2) FROM ciclos WHERE padrino = C.alias AND ciclo = C.ciclo GROUP BY ciclo),0) +
-  IFNULL((SELECT SUM(3) FROM ciclos WHERE padrino IN (SELECT alias FROM ciclos WHERE padrino = C.alias AND ciclo = C.ciclo) AND ciclo = C.ciclo GROUP BY ciclo),0) AS nivel
-FROM ciclos C WHERE paso = '3';

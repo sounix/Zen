@@ -82,7 +82,6 @@
 						<option value="BANAMEX">BANAMEX</option>
 						<option value="SANTANDER">SANTANDER</option>
 						<option value="SCOTIA BANK">SCOTIA BANK</option>
-						<option value="BANCO AZTECA">BANCO AZTECA</option>
 						<option value="BANCOPPEL">BANCOPPEL</option>
 					</select>
 				</div>

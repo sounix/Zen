@@ -6,6 +6,9 @@
 			<span class="otro">{alias}</span>
 			<!--<span class="otro"><time datetime="{tiempo}">Hoy es {tiempohumano}</time>-->
 		</div>
+
+		<div class="mensajes"> {msg} </div>
+		
 {vdatos}
 		<div id="formulario_registro">
 			<form id="formregistro" class="jqtransform zenform" name="jqtransform" action="<?=site_url('sistema/foliodeposito')?>" method="post">

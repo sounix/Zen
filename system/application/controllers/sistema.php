@@ -304,7 +304,7 @@ class Sistema extends Controller {
 				
 	}   // Revizado
 
-	function patrocinador() {
+	function patrocinador($error = '0') {
 		$temp = array();
 
 		$session_data = $this->session->userdata('session_array');
@@ -312,15 +312,27 @@ class Sistema extends Controller {
 			redirect('/sistema/login','refresh');
 		}
 
-		if($session_data['patrocinador'] == 'admin' ) { 
-			//$patrocinador = ''; 
+		if($error == '0') {
+
+			if($session_data['patrocinador'] == 'admin' ) { 
+				//$patrocinador = ''; 
+				$patrocinador = '<input type="text" value="" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
+				$msg = '<div class="alerta"> Debera resgistrar un Padrino </div>';
+			} 
+			else { 
+				//$patrocinador = $session_data['patrocinador'];
+				$patrocinador = '<input type="text" disabled value="' . $session_data['patrocinador'] . '" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
+				$msg = '<div class="exito"> Padrino registrado con exito </div>';
+			}
+
+		}
+		elseif ($error == '91') {
 			$patrocinador = '<input type="text" value="" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
-			$msg = '<div class="alerta"> Debera resgistrar un Padrino </div>';
-		} 
-		else { 
-			//$patrocinador = $session_data['patrocinador'];
-			$patrocinador = '<input type="text" disabled value="' . $session_data['patrocinador'] . '" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
-			$msg = '<div class="exito"> Padrino registrado con exito </div>';
+			$msg = '<div class="error"> No existe el Alias para Padrino </div>';
+		}
+		elseif ($error == '92') {
+			$patrocinador = '<input type="text" value="" name="patrocinador" id="patrocinador" class="required" minlength="2"/>';
+			$msg = '<div class="alerta"> Padrino no a realizado su Deposito </div>';
 		}
 
 		$datos = array(
@@ -347,22 +359,31 @@ class Sistema extends Controller {
 			redirect('/sistema/login','refresh');
 		}
 
-		$this->Usuarios->modificar_patrocinador($this->input->post('alias'),$this->input->post('patrocinador'),$this->input->post('ciclo'));
+		$error = $this->Usuarios->verificar_patrocinador($this->input->post('patrocinador'),$this->input->post('ciclo'));
 
-		$session_array = array(
-			'alias' => $session_data['alias'],
-			'nombrecompleto' => $session_data['nombrecompleto'],
-			'patrocinador' => $this->input->post('patrocinador'),
-			'ciclo'			 => $session_data['ciclo'],
-			
-			'session_ok' => $session_data['session_ok']
-		);
+		if($error == '0') {
 
-		$this->session->unset_userdata('session_array');
+			$this->Usuarios->modificar_patrocinador($this->input->post('alias'),$this->input->post('patrocinador'),$this->input->post('ciclo'));
 
-		$this->session->set_userdata('session_array',$session_array);
+			$session_array = array(
+				'alias' => $session_data['alias'],
+				'nombrecompleto' => $session_data['nombrecompleto'],
+				'patrocinador' => $this->input->post('patrocinador'),
+				'ciclo'			 => $session_data['ciclo'],
+				
+				'session_ok' => $session_data['session_ok']
+			);
 
-		redirect('/sistema/patrocinador','refresh');
+			$this->session->unset_userdata('session_array');
+
+			$this->session->set_userdata('session_array',$session_array);
+
+			redirect('/sistema/patrocinador','refresh');
+
+		}
+		else {
+			redirect('/sistema/patrocinador/'. $error,'refresh');
+		}
 
 	}  // Revizado
 
@@ -400,6 +421,7 @@ class Sistema extends Controller {
 			redirect('/sistema/login','refresh');
 		}
 
+		$msg = $this->Usuarios->msg_foliodeposito($session_data['alias'],$session_data['ciclo']);	
 		$folio = $this->Usuarios->mostrar_foliodeposito($session_data['alias'],$session_data['ciclo']);		
 
 		$arreglo = $this->Usuarios->alias_deposito($session_data['ciclo'],$session_data['alias']);
@@ -415,6 +437,7 @@ class Sistema extends Controller {
 			'tiempohumano' => date('d \d\e F \d\e Y'),
  			'tiempo' => date('Y-m-d'),
  			'folio' => $folio,
+ 			'msg' => $msg,
 
  			'vdatos' => $datos->result_array()
 		);
