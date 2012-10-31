@@ -216,6 +216,7 @@ class Sistema extends Controller {
 							'nombrecompleto' => $row2['nombres'] . ' ' . $row2['apellidos'],
 							'patrocinador'   => $row['patrocinador'],
 							'ciclo'			 => $row['ciclo'],
+							'paso'			 => $row['paso'],
 							
 							'session_ok'     => TRUE
 						);
@@ -280,6 +281,22 @@ class Sistema extends Controller {
 
 	// Inicio Aplicacion Usuario
 
+	function menuservicios() {
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		if($session_data['alias'] == 'zen01' OR $session_data['alias'] == 'zen02') {
+			$menuservicios = 'plantillas/menuservicios_paso4';
+		}
+		else {
+			$menuservicios = 'plantillas/menuservicios_paso' . $this->Usuarios->consulta_paso($session_data['alias'],$session_data['ciclo']);
+		}
+
+		return $menuservicios;
+	}
+
 	function cuentausuario() {
 		$temp = array();
 
@@ -291,7 +308,7 @@ class Sistema extends Controller {
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/cuentausuario', $temp,TRUE),
-			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse( $this->menuservicios(), $temp,TRUE),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
@@ -338,7 +355,7 @@ class Sistema extends Controller {
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/patrocinador', $temp,TRUE),
-			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'tiempohumano' => date('d \d\e F \d\e Y'),
@@ -400,7 +417,7 @@ class Sistema extends Controller {
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/editarregistro', $temp,TRUE),
-			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'tiempohumano' => date('d \d\e F \d\e Y'),
@@ -430,7 +447,7 @@ class Sistema extends Controller {
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/depositos', $temp,TRUE),
-			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
@@ -472,7 +489,7 @@ class Sistema extends Controller {
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/autorizacion', $temp,TRUE),
-			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
@@ -499,7 +516,7 @@ class Sistema extends Controller {
 		$datos = array(
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/pagos', $temp,TRUE),
-			'plantilla_cuerpo_der' => $this->parser->parse('plantillas/menuservicios', $temp,TRUE),
+			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],

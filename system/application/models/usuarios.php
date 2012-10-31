@@ -29,7 +29,7 @@ class Usuarios extends Model {
 
 	function consulta_alias_datos ($valias){
 
-		$sql = "SELECT A.alias,A.password,CASE WHEN B.padrino IS NULL THEN 'admin' ELSE B.padrino END AS patrocinador,A.ciclo FROM datosgenerales A LEFT JOIN ciclos B ON A.alias = B.alias AND A.ciclo = B.ciclo WHERE A.alias = '$valias'";
+		$sql = "SELECT A.alias,A.password,CASE WHEN B.padrino IS NULL THEN 'admin' ELSE B.padrino END AS patrocinador,A.ciclo,B.paso FROM datosgenerales A LEFT JOIN ciclos B ON A.alias = B.alias AND A.ciclo = B.ciclo WHERE A.alias = '$valias'";
 
 		$resultado = $this->db->query($sql);
 
@@ -45,6 +45,20 @@ class Usuarios extends Model {
 		return $resultado;
 
 	}  // Revizado
+
+	function consulta_paso($valias,$vciclo) {
+		$query = $this->db->query("
+			SELECT 
+				paso 
+			FROM ciclos 
+			WHERE ciclo = '$vciclo' AND alias = '$valias'
+		");
+		$row = $query->row_array();
+
+		$res = $row['paso']; 
+
+		return $res;
+	}
 
 	function alias_deposito ($vciclo,$valias) {
 
