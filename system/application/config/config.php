@@ -11,8 +11,8 @@
 |	http://example.com/
 |
 */
-$config['base_url']	= "http://127.0.0.1/zen/";
-//$config['base_url']	= "http://www.riquezaparatodos.org/zen/";
+// $config['base_url']	= "http://127.0.0.1/zen/";
+$config['base_url']	= "http://www.riquezaparatodos.org/zen/";
 
 
 /*
@@ -234,7 +234,7 @@ $config['encryption_key'] = 'riquezaparatodos';
 |
 */
 $config['sess_cookie_name']		= 'ci_session';
-$config['sess_expiration']		= 600; //7200;
+$config['sess_expiration']		= 1200; //7200;
 $config['sess_encrypt_cookie']	= FALSE;
 $config['sess_use_database']	= FALSE;
 $config['sess_table_name']		= 'ci_sessions';

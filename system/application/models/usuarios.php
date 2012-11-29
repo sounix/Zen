@@ -27,9 +27,10 @@ class Usuarios extends Model {
 		$this->db->query($sql);
 	}
 
-	function consulta_alias_datos ($valias){
+	function consulta_alias_datos ($valias,$vciclo = '1'){
 
-		$sql = "SELECT A.alias,A.password,CASE WHEN B.padrino IS NULL THEN 'admin' ELSE B.padrino END AS patrocinador,A.ciclo,B.paso FROM datosgenerales A LEFT JOIN ciclos B ON A.alias = B.alias AND A.ciclo = B.ciclo WHERE A.alias = '$valias'";
+		// $sql = "SELECT A.alias,A.password,CASE WHEN B.padrino IS NULL THEN 'admin' ELSE B.padrino END AS patrocinador,A.ciclo,B.paso FROM datosgenerales A LEFT JOIN ciclos B ON A.alias = B.alias AND A.ciclo = B.ciclo WHERE A.alias = '$valias' AND B.ciclo = '$vciclo'";
+		$sql = "SELECT A.alias,A.password,CASE WHEN B.padrino IS NULL THEN 'admin' ELSE B.padrino END AS patrocinador,B.ciclo,B.paso FROM datosgenerales A LEFT JOIN ciclos B ON A.alias = B.alias  AND B.ciclo = '$vciclo' WHERE A.alias = '$valias' AND B.ciclo = '$vciclo'";
 
 		$resultado = $this->db->query($sql);
 
@@ -58,6 +59,48 @@ class Usuarios extends Model {
 		$res = $row['paso']; 
 
 		return $res;
+	}
+
+	function muestra_cilos($valias) {
+		$query = $this->db->query("
+			SELECT Alias,CONCAT(MAX(C01),MAX(C02),MAX(C03),MAX(C04),MAX(C05),MAX(C06),MAX(C07)) AS CAD FROM (
+				SELECT alias, '<li><a href=\"cestadociclos/1\">Ciclo I</a></li>' AS C01, CASE WHEN paso > 2 THEN '<li><a href=\"cestadociclos/2\">Ciclo II</a></li>' ELSE '' END AS C02,'' AS C03,'' AS C04,'' AS C05,'' AS C06,'' AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '1'
+				UNION ALL
+				SELECT alias, '' AS C01, '<li><a href=\"cestadociclos/2\">Ciclo II</a></li>' AS C02, CASE WHEN paso > 2 THEN '<li><a href=\"cestadociclos/3\">Ciclo III</a></li>' ELSE '' END AS C03,'' AS C04,'' AS C05,'' AS C06,'' AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '2'
+				UNION ALL
+				SELECT alias, '' AS C01,  '' AS C02, '<li><a href=\"cestadociclos/3\">Ciclo III</a></li>' AS C03, CASE WHEN paso > 2 THEN '<li><a href=\"cestadociclos/4\">Ciclo IV</a></li>' ELSE '' END AS C04,'' AS C05,'' AS C06,'' AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '3'
+				UNION ALL
+				SELECT alias, '' AS C01,  '' AS C02,  '' AS C03, '<li><a href=\"cestadociclos/4\">Ciclo IV</a></li>' AS C04, CASE WHEN paso > 2 THEN '<li><a href=\"cestadociclos/5\">Ciclo V</a></li>' ELSE '' END AS C05,'' AS C06,'' AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '4'
+				UNION ALL
+				SELECT alias, '' AS C01,  '' AS C02,  '' AS C03,  '' AS C04, '<li><a href=\"cestadociclos/5\">Ciclo V</a></li>' AS C05, CASE WHEN paso > 2 THEN '<li><a href=\"cestadociclos/6\">Ciclo VI</a></li>' ELSE '' END AS C06,'' AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '5'
+				UNION ALL
+				SELECT alias, '' AS C01,  '' AS C02,  '' AS C03,  '' AS C04,  '' AS C05, '<li><a href=\"cestadociclos/6\">Ciclo VI</a></li>' AS C06, CASE WHEN paso > 2 THEN '<li><a href=\"cestadociclos/7\">Ciclo VII</a></li>' ELSE '' END AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '6'
+				UNION ALL
+				SELECT alias, '' AS C01,  '' AS C02,  '' AS C03,  '' AS C04,  '' AS C05,  '' AS C06, '<li><a href=\"cestadociclos/7\">Ciclo VII</a></li>' AS C07 FROM Ciclos WHERE alias = '$valias' AND Ciclo = '7'
+			) AS X
+			GROUP BY alias
+		");
+		$row = $query->row_array();
+
+		$res = $row['CAD']; 
+
+		return $res;
+	}	
+
+	function aseguraciclo($valias,$vciclo) {
+		$query = $this->db->query("
+			SELECT 
+				COUNT(*) AS reg
+			FROM ciclos 
+			WHERE ciclo = '$vciclo' AND alias = '$valias'
+		");
+		$row = $query->row_array();
+
+		if($row['reg'] == '0') {
+			$sql = "INSERT INTO ciclos (id,alias,ciclo,paso,fechap0) VALUES (0,'$valias','$vciclo','0',NOW())";
+
+			$this->db->query($sql);
+		}
 	}
 
 	function alias_deposito ($vciclo,$valias) {

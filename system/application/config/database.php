@@ -39,13 +39,13 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = "localhost";
 
-$db['default']['username'] = "root";
-$db['default']['password'] = "admin";
-$db['default']['database'] = "riquezaparatodos";
+// $db['default']['username'] = "root";
+// $db['default']['password'] = "admin";
+// $db['default']['database'] = "riquezaparatodos";
 
-//$db['default']['username'] = "w1081378_riqueza";
-//$db['default']['password'] = "Que11uvia";
-//$db['default']['database'] = "w1081378_riquezaparatodos";
+$db['default']['username'] = "w1081378_riqueza";
+$db['default']['password'] = "Que11uvia";
+$db['default']['database'] = "w1081378_riquezaparatodos";
 
 
 $db['default']['dbdriver'] = "mysqli";

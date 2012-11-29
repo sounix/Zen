@@ -1,7 +1,11 @@
 	<h2 class="titulotres">Servicios</h2>
 	<ul>
 		<li><a href="<?=site_url('sistema/cuentausuario')?>">Cuenta Usuario</a></li>
-		<li><a href="<?=site_url('sistema/editarregistro')?>">Editar Cuenta</a></li>
+		<!-- <li><a href="<?=site_url('sistema/editarregistro')?>">Editar Cuenta</a></li> -->
+	</ul>
+
+	<ul>
+		{estadociclos}
 	</ul>
 
 	<ul>

@@ -297,6 +297,76 @@ class Sistema extends Controller {
 		return $menuservicios;
 	}
 
+	function cestadociclos ($vciclo) {
+
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		$this->Usuarios->aseguraciclo($session_data['alias'],$vciclo);
+
+
+		// *#--COD 2012E11E29--#*
+		$arreglo = $this->Usuarios->consulta_alias_datos($session_data['alias'],$vciclo);
+		$row = $arreglo->row_array();
+
+
+		$session_array = array(
+			'alias' => $session_data['alias'],
+			'nombrecompleto' => $session_data['nombrecompleto'],
+			'patrocinador'	 => $row['patrocinador'],
+			'ciclo'			 => $vciclo,
+			'paso'			 => $session_data['paso'],
+			
+			'session_ok' => $session_data['session_ok']
+		);
+
+		$this->session->unset_userdata('session_array');
+
+		$this->session->set_userdata('session_array',$session_array);
+
+		redirect('/sistema/cuentausuario','refresh');
+
+	}
+
+	function estadociclos() {
+		$session_data = $this->session->userdata('session_array');
+		if($session_data['session_ok'] != TRUE) {
+			redirect('/sistema/login','refresh');
+		}
+
+		if($session_data['alias'] == 'zen01' OR $session_data['alias'] == 'zen02') {
+			$estadociclos = '
+				<li><a href="cestadociclos/1">Ciclo I</a></li>
+				<li><a href="cestadociclos/2">Ciclo II</a></li>
+				<li><a href="cestadociclos/3">Ciclo III</a></li>
+				<li><a href="cestadociclos/4">Ciclo IV</a></li>
+				<li><a href="cestadociclos/5">Ciclo V</a></li>
+				<li><a href="cestadociclos/6">Ciclo VI</a></li>
+				<li><a href="cestadociclos/7">Ciclo VII</a></li>
+			';
+		}
+		else {
+			// $estadociclos = '
+			// 	<li><a href="cestadociclos/1">Ciclo I</a></li>
+			// 	<li><a href="cestadociclos/2">Ciclo II</a></li>
+			// 	<li><a href="cestadociclos/3">Ciclo III</a></li>
+			// 	<li><a href="cestadociclos/4">Ciclo IV</a></li>
+			// 	<li><a href="cestadociclos/5">Ciclo V</a></li>
+			// 	<li><a href="cestadociclos/6">Ciclo VI</a></li>
+			// 	<li><a href="cestadociclos/7">Ciclo VII</a></li>
+			// ';
+
+			$estadociclos = $this->Usuarios->muestra_cilos($session_data['alias']);
+
+		}
+
+		return $estadociclos;
+
+		// return '';
+	}
+
 	function cuentausuario() {
 		$temp = array();
 
@@ -309,6 +379,7 @@ class Sistema extends Controller {
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/cuentausuario', $temp,TRUE),
 			'plantilla_cuerpo_der' => $this->parser->parse( $this->menuservicios(), $temp,TRUE),
+			'estadociclos' => $this->estadociclos(),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
@@ -356,6 +427,7 @@ class Sistema extends Controller {
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/patrocinador', $temp,TRUE),
 			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
+			'estadociclos' => $this->estadociclos(),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'tiempohumano' => date('d \d\e F \d\e Y'),
@@ -387,6 +459,7 @@ class Sistema extends Controller {
 				'nombrecompleto' => $session_data['nombrecompleto'],
 				'patrocinador' => $this->input->post('patrocinador'),
 				'ciclo'			 => $session_data['ciclo'],
+				'paso'			 => $session_data['paso'],
 				
 				'session_ok' => $session_data['session_ok']
 			);
@@ -448,6 +521,7 @@ class Sistema extends Controller {
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/depositos', $temp,TRUE),
 			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
+			'estadociclos' => $this->estadociclos(),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
@@ -490,6 +564,7 @@ class Sistema extends Controller {
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/autorizacion', $temp,TRUE),
 			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
+			'estadociclos' => $this->estadociclos(),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
@@ -517,6 +592,7 @@ class Sistema extends Controller {
 			'plantilla_titulo' => 'Cuenta de Usuario - www.riquezaparatodos.org',
 			'plantilla_cuerpo_izq' => $this->parser->parse('plantillas/pagos', $temp,TRUE),
 			'plantilla_cuerpo_der' => $this->parser->parse($this->menuservicios(), $temp,TRUE),
+			'estadociclos' => $this->estadociclos(),
 			'nombrecompleto' => $session_data['nombrecompleto'],
 			'alias' => $session_data['alias'],
 			'ciclo' => $session_data['ciclo'],
